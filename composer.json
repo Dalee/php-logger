@@ -1,0 +1,22 @@
+{
+	"name": "dalee-php-logger",
+	"authors": [
+		{
+			"name": "Dalee Dev",
+			"email": "dev@dalee.ru",
+			"homepage": "http://www.dalee.ru"
+		}
+	],
+	"description": "Php logger for ELK",
+	"license": "MIT",
+	"minimum-stability": "stable",
+	"config": {
+		"secure-http": false,
+		"platform": {
+			"php": "5.4.22"
+		}
+	},
+	"autoload": {
+		"classmap": ["src/"]
+	}
+}
