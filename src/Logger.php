@@ -271,7 +271,10 @@ class Logger {
 		$facility = $this->facility;
 		$hostname = $this->hostname;
 		$app = $this->app;
-		$date = date('M j H:m:s');
+
+		$now = DateTime::createFromFormat('U.u', microtime(true));
+		$date = $now->format("M j H:m:s.u");
+		$date = substr($date, 0, strlen($date) - 3);
 
 		foreach ($this->adapters as $adapter) {
 			$adapter->write($severity, $facility, $hostname, $app, $date, $message);
