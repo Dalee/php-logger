@@ -11,12 +11,6 @@ abstract class AbstractAdapter {
 	 * @return int
 	 */
 	protected function calcPriority($facility, $severity) {
-		// just to be sure!
-		if ($facility < 0) {$facility =  0;}
-		if ($facility > 23) {$facility = 23;}
-		if ($severity < 0) {$severity =  0;}
-		if ($severity > 7) {$severity =  7;}
-		
 		return ($facility * 8 + $severity);
 	}
 

@@ -44,9 +44,6 @@ class Logger {
 	/** @var int */
 	private $facility;
 
-	/** @var int */
-	private $severity;
-
 	/** @var string */
 	private $hostname;
 
@@ -60,29 +57,28 @@ class Logger {
 	 * Logger constructor.
 	 *
 	 * @param int $facility
-	 * @param int $severity
 	 * @param string $hostname
 	 * @param string $app
 	 * @throws Exception on incorrect $hostname / $app
 	 */
-	function __construct($facility=1, $severity=7, $hostname="", $app="") {
+	function __construct($facility=16, $hostname="", $app="") {
+		// just to be sure!
+		if ($facility < 0) {$facility =  0;}
+		if ($facility > 23) {$facility = 23;}
+
 		$this->facility = $facility;
-		$this->severity = $severity;
-		$this->hostname = $hostname;
-		$this->app = $app;
 
-		if ($this->hostname == "") {
+		if ($hostname == "") {
 			$host = gethostname();
-
 			$this->hostname = $host && $this->hostnameCheck($host) ? $host : 'webserver';
-		} elseif (!$this->hostnameCheck($this->hostname)) {
-			throw new Exception('Hostname should be either IP or correct FQDN and no longer than 255 chars');
+		} else {
+			$this->setHostname($hostname);
 		}
 
-		if ($this->app == "") {
+		if ($app == "") {
 			$this->app = "php";
-		} elseif (!preg_match('/^[a-z0-9_.-]{1,48}$/i' , $this->app)) {
-			throw new Exception('Incorrect app name, it should match: /^[a-z0-9_.-]{1,48}$/i');
+		} else {
+			$this->setApp($app);
 		}
 	}
 
@@ -91,7 +87,12 @@ class Logger {
 	 * @return $this
 	 */
 	public function setFacility($val) {
-		$this->facility = $val;
+		$facility = $val;
+
+		if ($facility < 0) {$facility =  0;}
+		if ($facility > 23) {$facility = 23;}
+		
+		$this->facility = $facility;
 
 		return $this;
 	}
@@ -99,8 +100,13 @@ class Logger {
 	/**
 	 * @param string $val
 	 * @return $this
+	 * @throws Exception on incorrect $hostname
 	 */
 	public function setHostname($val) {
+		if (!$this->hostnameCheck($val)) {
+			throw new Exception('Hostname should be either IP or correct FQDN and no longer than 255 chars');
+		}
+		
 		$this->hostname = $val;
 
 		return $this;
@@ -109,8 +115,12 @@ class Logger {
 	/**
 	 * @param string $val
 	 * @return $this
+	 * @throws Exception on incorrect $app
 	 */
 	public function setApp($val) {
+		if (!preg_match('/^[a-z0-9_.-]{1,48}$/i', $val)) {
+			throw new Exception('Incorrect app name, it should match: /^[a-z0-9_.-]{1,48}$/i');
+		}
 		$this->app = $val;
 
 		return $this;
@@ -146,9 +156,9 @@ class Logger {
 	protected function hostnameCheck($hostname) {
 		$fqdnCheck = true;
 
-		$fqdnCheck = fqdnCheck && strlen($hostname) <= 255;
-		$fqdnCheck = fqdnCheck && $this->isValidFQDN($hostname);
-		$fqdnCheck = fqdnCheck || filter_var($hostname, FILTER_VALIDATE_IP);
+		$fqdnCheck = $fqdnCheck && strlen($hostname) <= 255;
+		$fqdnCheck = $fqdnCheck && $this->isValidFQDN($hostname);
+		$fqdnCheck = $fqdnCheck || filter_var($hostname, FILTER_VALIDATE_IP);
 		
 		return $fqdnCheck;
 	}
@@ -192,63 +202,63 @@ class Logger {
 	 * @param string $message
 	 */
 	public function log($message) {
-		$this->_log(7, $message);
+		return $this->_log(7, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function emerg($message) {
-		$this->_log(0, $message);
+		return $this->_log(0, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function alert($message) {
-		$this->_log(1, $message);
+		return $this->_log(1, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function critical($message) {
-		$this->_log(2, $message);
+		return $this->_log(2, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function error($message) {
-		$this->_log(3, $message);
+		return $this->_log(3, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function warning($message) {
-		$this->_log(4, $message);
+		return $this->_log(4, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function notice($message) {
-		$this->_log(5, $message);
+		return $this->_log(5, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function info($message) {
-		$this->_log(6, $message);
+		return $this->_log(6, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function debug($message) {
-		$this->_log(7, $message);
+		return $this->_log(7, $message);
 	}
 
 	/**
@@ -257,7 +267,7 @@ class Logger {
 	 * @param int $severity
 	 * @param string $message
 	 */
-	private function _log($severity, $message) {
+	public function _log($severity, $message) {
 		$facility = $this->facility;
 		$hostname = $this->hostname;
 		$app = $this->app;
