@@ -3,14 +3,26 @@
 require_once 'AbstractAdapter.php';
 
 class SyslogAdapter extends AbstractAdapter {
+
+	/** @var string */
 	private $server;
+
+	/** @var int */
 	private $port;
-	
+
+	/**
+	 * SyslogAdapter constructor.
+	 * @param string $server
+	 * @param int $port
+	 */
 	function __construct($server='127.0.0.1', $port=514) {
 		$this->server = $server;
 		$this->port = $port;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function write($severity, $facility, $hostname, $app, $date, $message) {
 		$priority = $this->calcPriority($facility, $severity);
 		$msg = $this->cleanMessage($message);
@@ -35,6 +47,9 @@ class SyslogAdapter extends AbstractAdapter {
 		return $this->send($header);
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	protected function send($message) {
 		$fp = fsockopen("udp://".$this->server, $this->port, $errno, $errstr);
 		if ($fp) {

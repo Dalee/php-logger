@@ -8,6 +8,8 @@ date_default_timezone_set('Europe/Moscow');
 $logger = new Logger;
 $logger->addAdapter(new SyslogAdapter('elk.local', '5000'));
 
+echo gethostname();
+
 $logger->log('LOG');
 $logger->error('ERRR!');
 $logger->warning('BEWARE!');
