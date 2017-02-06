@@ -1,4 +1,4 @@
-phpcs := /vendor/bin/phpcs --standard=ruleset.xml
+phpcs := ./vendor/bin/phpcs --standard=ruleset.xml
 
 test:
 	./vendor/bin/phpunit
