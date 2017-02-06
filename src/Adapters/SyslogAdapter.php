@@ -15,7 +15,7 @@ class SyslogAdapter extends AbstractAdapter {
 	 * @param string $server
 	 * @param int $port
 	 */
-	function __construct($server='127.0.0.1', $port=514) {
+	public function __construct($server='127.0.0.1', $port=514) {
 		$this->server = $server;
 		$this->port = $port;
 	}

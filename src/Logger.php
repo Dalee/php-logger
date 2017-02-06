@@ -42,6 +42,30 @@
 class Logger {
 
 	/** @var int */
+	const SEVERITY_EMERGENCY = 0;
+
+	/** @var int */
+	const SEVERITY_ALERT = 1;
+
+	/** @var int */
+	const SEVERITY_CRITICAL = 2;
+
+	/** @var int */
+	const SEVERITY_ERROR = 3;
+
+	/** @var int */
+	const SEVERITY_WARNING = 4;
+
+	/** @var int */
+	const SEVERITY_NOTICE = 5;
+
+	/** @var int */
+	const SEVERITY_INFORMATIONAL = 6;
+
+	/** @var int */
+	const SEVERITY_DEBUG = 7;
+
+	/** @var int */
 	private $facility;
 
 	/** @var string */
@@ -57,27 +81,24 @@ class Logger {
 	 * Logger constructor.
 	 *
 	 * @param int $facility
-	 * @param string $hostname
 	 * @param string $app
 	 * @throws Exception on incorrect $hostname / $app
 	 */
-	function __construct($facility=16, $hostname="", $app="") {
+	public function __construct($facility=16, $app="php") {
 		// just to be sure!
-		if ($facility < 0) {$facility =  0;}
-		if ($facility > 23) {$facility = 23;}
+		if ($facility < 0) {
+			$facility =  0;
+		}
+		if ($facility > 23) {
+			$facility = 23;
+		}
 
 		$this->facility = $facility;
 
-		if ($hostname == "") {
-			$host = gethostname();
-			$this->hostname = $host && $this->hostnameCheck($host) ? $host : 'webserver';
-		} else {
-			$this->setHostname($hostname);
-		}
+		$host = gethostname();
+		$this->hostname = $host && $this->hostnameCheck($host) ? $host : 'webserver';
 
-		if ($app == "") {
-			$this->app = "php";
-		} else {
+		if ($app !== "php") {
 			$this->setApp($app);
 		}
 	}
@@ -89,8 +110,12 @@ class Logger {
 	public function setFacility($val) {
 		$facility = $val;
 
-		if ($facility < 0) {$facility =  0;}
-		if ($facility > 23) {$facility = 23;}
+		if ($facility < 0) {
+			$facility =  0;
+		}
+		if ($facility > 23) {
+			$facility = 23;
+		}
 		
 		$this->facility = $facility;
 
@@ -202,63 +227,63 @@ class Logger {
 	 * @param string $message
 	 */
 	public function log($message) {
-		return $this->_log(7, $message);
+		$this->_log(self::SEVERITY_DEBUG, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function emerg($message) {
-		return $this->_log(0, $message);
+		$this->_log(self::SEVERITY_EMERGENCY, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function alert($message) {
-		return $this->_log(1, $message);
+		$this->_log(self::SEVERITY_ALERT, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function critical($message) {
-		return $this->_log(2, $message);
+		$this->_log(self::SEVERITY_CRITICAL, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function error($message) {
-		return $this->_log(3, $message);
+		$this->_log(self::SEVERITY_CRITICAL, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function warning($message) {
-		return $this->_log(4, $message);
+		$this->_log(self::SEVERITY_WARNING, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function notice($message) {
-		return $this->_log(5, $message);
+		$this->_log(self::SEVERITY_NOTICE, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function info($message) {
-		return $this->_log(6, $message);
+		$this->_log(self::SEVERITY_INFORMATIONAL, $message);
 	}
 
 	/**
 	 * @param string $message
 	 */
 	public function debug($message) {
-		return $this->_log(7, $message);
+		$this->_log(self::SEVERITY_DEBUG, $message);
 	}
 
 	/**
@@ -267,7 +292,7 @@ class Logger {
 	 * @param int $severity
 	 * @param string $message
 	 */
-	public function _log($severity, $message) {
+	private function _log($severity, $message) {
 		$facility = $this->facility;
 		$hostname = $this->hostname;
 		$app = $this->app;
