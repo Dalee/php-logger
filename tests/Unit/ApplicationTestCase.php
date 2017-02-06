@@ -1,5 +1,7 @@
 <?php
 
+namespace Dalee\ELK\Tests\Unit;
+
 abstract class ApplicationTestCase extends \PHPUnit_Framework_TestCase {
 
 	protected function assertException(callable $callback, $expectedException = 'Exception', $expectedCode = null, $expectedMessage = null)

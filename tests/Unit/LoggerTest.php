@@ -1,5 +1,9 @@
 <?php
 
+namespace Dalee\ELK\Tests\Unit;
+
+use Dalee\ELK\Logger;
+
 class LoggerTest extends ApplicationTestCase {
 
 	public function testItAcceptsCorrectFacility() {

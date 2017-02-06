@@ -1,5 +1,9 @@
 <?php
 
+namespace Dalee\ELK;
+
+use Dalee\ELK\Adapters\AbstractAdapter;
+
 /**
  * Syslog Dictionary
  *
@@ -100,6 +104,8 @@ class Logger {
 
 		if ($app !== "php") {
 			$this->setApp($app);
+		} else {
+			$this->app = $app;
 		}
 	}
 
@@ -129,7 +135,7 @@ class Logger {
 	 */
 	public function setHostname($val) {
 		if (!$this->hostnameCheck($val)) {
-			throw new Exception('Hostname should be either IP or correct FQDN and no longer than 255 chars');
+			throw new \Exception('Hostname should be either IP or correct FQDN and no longer than 255 chars');
 		}
 		
 		$this->hostname = $val;
@@ -144,7 +150,7 @@ class Logger {
 	 */
 	public function setApp($val) {
 		if (!preg_match('/^[a-z0-9_.-]{1,48}$/i', $val)) {
-			throw new Exception('Incorrect app name, it should match: /^[a-z0-9_.-]{1,48}$/i');
+			throw new \Exception('Incorrect app name, it should match: /^[a-z0-9_.-]{1,48}$/i');
 		}
 		$this->app = $val;
 
@@ -297,7 +303,7 @@ class Logger {
 		$hostname = $this->hostname;
 		$app = $this->app;
 
-		$now = DateTime::createFromFormat('U.u', microtime(true));
+		$now = \DateTime::createFromFormat('U.u', microtime(true));
 		$date = $now->format("M j H:m:s.u");
 		$date = substr($date, 0, strlen($date) - 3);
 

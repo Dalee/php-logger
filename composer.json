@@ -22,6 +22,9 @@
 		"squizlabs/php_codesniffer": "~2.8"
 	},
 	"autoload": {
-		"classmap": ["src/", "tests/"]
+		"psr-4": {
+			"Dalee\\ELK\\": ["src/"],
+			"Dalee\\ELK\\Tests\\": ["tests/"]
+		}
 	}
 }

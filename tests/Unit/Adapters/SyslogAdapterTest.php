@@ -1,17 +1,24 @@
 <?php
 
+namespace Dalee\ELK\Tests\Unit\Adapters;
+
+use Dalee\ELK\Tests\Unit\ApplicationTestCase;
+use Dalee\ELK\Logger;
+use Dalee\ELK\Adapters\AbstractAdapter;
+use Dalee\ELK\Adapters\SyslogAdapter;
+
 class SyslogAdapterTest extends ApplicationTestCase {
 
 	public function testPriorityCalculation() {
 		$mock = $this->getMock(
-			'SyslogAdapter'
+			'\Dalee\ELK\Adapters\SyslogAdapter'
 		);
 
 		$mock
 			->expects($this->any())
 			->method('calcPriority');
 
-		$reflection = new ReflectionObject($mock);
+		$reflection = new \ReflectionObject($mock);
 		$method = $reflection->getMethod('calcPriority');
 		$method->setAccessible(true);
 
@@ -22,14 +29,14 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	public function testCleanMessage() {
 		$message = "\x12|this|is|sparta\x09\x01\x02";
 		$mock = $this->getMock(
-			'SyslogAdapter'
+			'\Dalee\ELK\Adapters\SyslogAdapter'
 		);
 
 		$mock
 			->expects($this->any())
 			->method('cleanMessage');
 
-		$reflection = new ReflectionObject($mock);
+		$reflection = new \ReflectionObject($mock);
 		$method = $reflection->getMethod('cleanMessage');
 		$method->setAccessible(true);
 

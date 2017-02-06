@@ -1,6 +1,6 @@
 <?php
 
-require_once 'AbstractAdapter.php';
+namespace Dalee\ELK\Adapters;
 
 class SyslogAdapter extends AbstractAdapter {
 

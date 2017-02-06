@@ -1,5 +1,7 @@
 <?php
 
+namespace Dalee\ELK\Adapters;
+
 abstract class AbstractAdapter {
 
 	/**
