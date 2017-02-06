@@ -27,14 +27,13 @@ class SyslogAdapter extends AbstractAdapter {
 		$priority = $this->calcPriority($facility, $severity);
 		$msg = $this->cleanMessage($message);
 
-		if (count($msg) === 0) {
+		if (!strlen($msg)) {
 			return;
 		}
 
 		$header = sprintf("<%s>%s", $priority, $date);
 
 		if ($hostname) {
-			$hostname = 'www.megafon.ru';
 			$header = $header . ' ' . $hostname;
 		}
 
