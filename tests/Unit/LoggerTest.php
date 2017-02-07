@@ -1,18 +1,19 @@
 <?php
 
-namespace Dalee\ELK\Tests\Unit;
+namespace Dalee\Logger\Tests\Unit;
 
-use Dalee\ELK\Logger;
+use Dalee\Logger\Logger;
 
 class LoggerTest extends ApplicationTestCase {
 
 	public function testItAcceptsCorrectFacility() {
 		$logger = new Logger(5);
 		$this->assertEquals(5, $logger->getFacility());
-		$logger = new Logger(355);
-		$this->assertEquals(23, $logger->getFacility());
-		$logger = new Logger(-1);
-		$this->assertEquals(0, $logger->getFacility());
+
+		$InitWithWrongFacility = function() {
+			$logger = new Logger(355);
+		};
+		$this->assertException($InitWithWrongFacility, '\UnexpectedValueException');
 	}
 
 	public function testFacilityChange() {
@@ -20,10 +21,11 @@ class LoggerTest extends ApplicationTestCase {
 		$this->assertEquals(16, $logger->getFacility());
 		$logger->setFacility(3);
 		$this->assertEquals(3, $logger->getFacility());
-		$logger->setFacility(-200);
-		$this->assertEquals(0, $logger->getFacility());
-		$logger->setFacility(9999);
-		$this->assertEquals(23, $logger->getFacility());
+
+		$setWrongFacility = function() {
+			(new Logger)->setFacility(-1);
+		};
+		$this->assertException($setWrongFacility, '\UnexpectedValueException');
 	}
 
 	public function testCorrectHostname() {
@@ -34,12 +36,10 @@ class LoggerTest extends ApplicationTestCase {
 		$this->assertEquals('127.0.0.1', $logger->getHostname());
 
 		$setInvalidHostname = function () {
-			$logger = new Logger();
-			$logger->setHostname('> invalid');
+			(new Logger)->setHostname('> invalid');
 		};
 		$setTooLongHostname = function () {
-			$logger = new Logger();
-			$logger->setHostname(
+			(new Logger)->setHostname("aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
@@ -55,26 +55,23 @@ class LoggerTest extends ApplicationTestCase {
 			);
 		};
 
-		$this->assertException($setInvalidHostname);
-		$this->assertException($setTooLongHostname);
+		$this->assertException($setInvalidHostname, '\UnexpectedValueException');
+		$this->assertException($setTooLongHostname, '\UnexpectedValueException');
 	}
 
-	public function testCorrectApp() {
+	public function testCorrectAppName() {
 		$logger = new Logger;
 
-		$logger->setApp('worker-node1');
-		$this->assertEquals('worker-node1', $logger->getApp());
-		$logger->setApp('worker-node1');
-		$this->assertEquals('worker-node1', $logger->getApp());
+		$logger->setAppName('worker-node1');
+		$this->assertEquals('worker-node1', $logger->getAppName());
+		$logger->setAppName('worker-node1');
+		$this->assertEquals('worker-node1', $logger->getAppName());
 
 		$setInvalidApp = function () {
-			$logger = new Logger();
-			$logger->setApp('> invalid');
+			(new Logger)->setAppName('> invalid');
 		};
 		$setTooLongApp = function () {
-			$logger = new Logger();
-			$logger->setApp(
-				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
+			(new Logger)->setAppName("aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
@@ -82,7 +79,7 @@ class LoggerTest extends ApplicationTestCase {
 			);
 		};
 
-		$this->assertException($setInvalidApp);
-		$this->assertException($setTooLongApp);
+		$this->assertException($setInvalidApp, '\UnexpectedValueException');
+		$this->assertException($setTooLongApp, '\UnexpectedValueException');
 	}
 }

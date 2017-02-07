@@ -1,16 +1,17 @@
 <?php
 
-namespace Dalee\ELK\Tests\Unit\Adapters;
+namespace Dalee\Logger\Tests\Unit\Adapters;
 
-use Dalee\ELK\Tests\Unit\ApplicationTestCase;
-use Dalee\ELK\Logger;
-use Dalee\ELK\Adapters\SyslogAdapter;
+use Dalee\Logger\Tests\Unit\ApplicationTestCase;
+use Dalee\Logger\Logger;
+use Dalee\Logger\Adapter\AbstractAdapter;
+use Dalee\Logger\Adapter\SyslogAdapter;
 
 class SyslogAdapterTest extends ApplicationTestCase {
 
 	public function testPriorityCalculation() {
 		$mock = $this->getMock(
-			'\Dalee\ELK\Adapters\SyslogAdapter'
+			'\Dalee\Logger\Adapter\SyslogAdapter'
 		);
 
 		$mock
@@ -28,7 +29,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	public function testCleanMessage() {
 		$message = "\x12|this|is|sparta\x09\x01\x02";
 		$mock = $this->getMock(
-			'\Dalee\ELK\Adapters\SyslogAdapter'
+			'\Dalee\Logger\Adapter\SyslogAdapter'
 		);
 
 		$mock

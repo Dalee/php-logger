@@ -1,8 +1,8 @@
 <?php
 
-namespace Dalee\ELK;
+namespace Dalee\Logger;
 
-use Dalee\ELK\Adapters\AbstractAdapter;
+use Dalee\Logger\Adapter\AbstractAdapter;
 
 /**
  * Syslog Dictionary
@@ -69,13 +69,91 @@ class Logger {
 	const SEVERITY_DEBUG = 7;
 
 	/** @var int */
+	const FACILITY_KERNEL = 0;
+
+	/** @var int */
+	const FACILITY_USER = 1;
+
+	/** @var int */
+	const FACILITY_MAIL = 2;
+
+	/** @var int */
+	const FACILITY_SYSTEM = 3;
+
+	/** @var int */
+	const FACILITY_SECURITY0 = 4;
+
+	/** @var int */
+	const FACILITY_SECURITY = 4;
+
+	/** @var int */
+	const FACILITY_SYSLOG = 5;
+
+	/** @var int */
+	const FACILITY_PRINTER = 6;
+
+	/** @var int */
+	const FACILITY_NEWS = 7;
+
+	/** @var int */
+	const FACILITY_UUCP = 8;
+
+	/** @var int */
+	const FACILITY_CLOCK0 = 9;
+
+	/** @var int */
+	const FACILITY_CLOCK = 9;
+
+	/** @var int */
+	const FACILITY_SECURITY1 = 10;
+
+	/** @var int */
+	const FACILITY_FTP = 11;
+
+	/** @var int */
+	const FACILITY_NTP = 12;
+
+	/** @var int */
+	const FACILITY_AUDIT = 13;
+
+	/** @var int */
+	const FACILITY_ALERT = 14;
+
+	/** @var int */
+	const FACILITY_CLOCK1 = 15;
+
+	/** @var int */
+	const FACILITY_LOCAL0 = 16;
+
+	/** @var int */
+	const FACILITY_LOCAL1 = 17;
+
+	/** @var int */
+	const FACILITY_LOCAL2 = 18;
+
+	/** @var int */
+	const FACILITY_LOCAL3 = 19;
+
+	/** @var int */
+	const FACILITY_LOCAL4 = 20;
+
+	/** @var int */
+	const FACILITY_LOCAL5 = 21;
+
+	/** @var int */
+	const FACILITY_LOCAL6 = 22;
+
+	/** @var int */
+	const FACILITY_LOCAL7 = 23;
+
+	/** @var int */
 	private $facility;
 
 	/** @var string */
 	private $hostname;
 
 	/** @var string */
-	private $app;
+	private $appName;
 
 	/** @var array */
 	private $adapters = [];
@@ -84,42 +162,29 @@ class Logger {
 	 * Logger constructor.
 	 *
 	 * @param int $facility
-	 * @param string $app
-	 * @throws Exception on incorrect $hostname / $app
+	 * @param string $appName
+	 * @throws \UnexpectedValueException on incorrect $facility / $appName
 	 */
-	public function __construct($facility = 16, $app = "php") {
-		// just to be sure!
-		if ($facility < 0) {
-			$facility = 0;
-		}
-		if ($facility > 23) {
-			$facility = 23;
-		}
+	public function __construct($facility=self::FACILITY_LOCAL0, $appName='php') {
+		$this->setFacility($facility);
 
-		$this->facility = $facility;
+		$this->hostname = gethostname();
 
-		$host = gethostname();
-		$this->hostname = $host && $this->hostnameCheck($host) ? $host : 'webserver';
-
-		if ($app !== "php") {
-			$this->setApp($app);
-		} else {
-			$this->app = $app;
-		}
+		$this->appName = $appName;
 	}
 
 	/**
-	 * @param int $val
+	 * @param int $facility
 	 * @return $this
+	 * @throws \UnexpectedValueException on incorrect $facility
 	 */
-	public function setFacility($val) {
-		$facility = $val;
-
-		if ($facility < 0) {
-			$facility = 0;
-		}
-		if ($facility > 23) {
-			$facility = 23;
+	public function setFacility($facility) {
+		if ($facility < self::FACILITY_KERNEL || $facility > self::FACILITY_LOCAL7) {
+			throw new \UnexpectedValueException(sprintf(
+				'Invalid facility value, must be from %d to %d.',
+				self::FACILITY_KERNEL,
+				self::FACILITY_LOCAL7
+			));
 		}
 
 		$this->facility = $facility;
@@ -130,28 +195,28 @@ class Logger {
 	/**
 	 * @param string $val
 	 * @return $this
-	 * @throws Exception on incorrect $hostname
+	 * @throws \UnexpectedValueException on incorrect $hostname
 	 */
-	public function setHostname($val) {
-		if (!$this->hostnameCheck($val)) {
-			throw new \Exception('Hostname should be either IP or correct FQDN and no longer than 255 chars');
+	public function setHostname($hostname) {
+		if (!$this->isHostnameValid($hostname)) {
+			throw new \UnexpectedValueException('Hostname should be either IP or correct FQDN and no longer than 255 chars.');
 		}
-
-		$this->hostname = $val;
+		
+		$this->hostname = $hostname;
 
 		return $this;
 	}
 
 	/**
-	 * @param string $val
+	 * @param string $appName
 	 * @return $this
-	 * @throws Exception on incorrect $app
+	 * @throws \UnexpectedValueException on incorrect $appName
 	 */
-	public function setApp($val) {
-		if (!preg_match('/^[a-z0-9_.-]{1,48}$/i', $val)) {
-			throw new \Exception('Incorrect app name, it should match: /^[a-z0-9_.-]{1,48}$/i');
+	public function setAppName($appName) {
+		if (!preg_match('/^[a-z0-9_.-]{1,48}$/i', $appName)) {
+			throw new \UnexpectedValueException('Incorrect app name, it should match: /^[a-z0-9_.-]{1,48}$/i.');
 		}
-		$this->app = $val;
+		$this->appName = $appName;
 
 		return $this;
 	}
@@ -173,8 +238,8 @@ class Logger {
 	/**
 	 * @return string
 	 */
-	public function getApp() {
-		return $this->app;
+	public function getAppName() {
+		return $this->appName;
 	}
 
 	/**
@@ -183,7 +248,7 @@ class Logger {
 	 * @param $hostname
 	 * @return bool
 	 */
-	protected function hostnameCheck($hostname) {
+	protected function isHostnameValid($hostname) {
 		$fqdnCheck = true;
 
 		$fqdnCheck = $fqdnCheck && strlen($hostname) <= 255;
@@ -303,14 +368,14 @@ class Logger {
 	private function _log($severity, $message) {
 		$facility = $this->facility;
 		$hostname = $this->hostname;
-		$app = $this->app;
+		$appName = $this->appName;
 
 		$now = \DateTime::createFromFormat('U.u', microtime(true));
-		$date = $now->format("M j H:m:s.u");
+		$date = $now->format('M j H:m:s.u');
 		$date = substr($date, 0, strlen($date) - 3);
 
 		foreach ($this->adapters as $adapter) {
-			$adapter->write($severity, $facility, $hostname, $app, $date, $message);
+			$adapter->write($severity, $facility, $hostname, $appName, $date, $message);
 		}
 	}
 }

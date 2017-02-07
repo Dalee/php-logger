@@ -1,6 +1,6 @@
 <?php
 
-namespace Dalee\ELK\Adapters;
+namespace Dalee\Logger\Adapter;
 
 abstract class AbstractAdapter {
 
@@ -33,12 +33,12 @@ abstract class AbstractAdapter {
 	 * @param int $severity
 	 * @param int $facility
 	 * @param string $hostname
-	 * @param string $app
+	 * @param string $appName
 	 * @param string $date
 	 * @param string $message
 	 * @return string
 	 */
-	abstract public function write($severity, $facility, $hostname, $app, $date, $message);
+	abstract public function write($severity, $facility, $hostname, $appName, $date, $message);
 
 	/**
 	 * Send message.

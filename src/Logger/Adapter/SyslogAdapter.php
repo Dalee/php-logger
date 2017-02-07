@@ -1,6 +1,6 @@
 <?php
 
-namespace Dalee\ELK\Adapters;
+namespace Dalee\Logger\Adapter;
 
 class SyslogAdapter extends AbstractAdapter {
 
@@ -23,7 +23,7 @@ class SyslogAdapter extends AbstractAdapter {
 	/**
 	 * @inheritdoc
 	 */
-	public function write($severity, $facility, $hostname, $app, $date, $message) {
+	public function write($severity, $facility, $hostname, $appName, $date, $message) {
 		$priority = $this->calcPriority($facility, $severity);
 		$msg = $this->cleanMessage($message);
 
@@ -31,14 +31,14 @@ class SyslogAdapter extends AbstractAdapter {
 			return;
 		}
 
-		$header = sprintf("<%s>%s", $priority, $date);
+		$header = sprintf('<%s>%s', $priority, $date);
 
 		if ($hostname) {
 			$header = $header . ' ' . $hostname;
 		}
 
-		if ($app) {
-			$header = $header . ' ' . $app . ':';
+		if ($appName) {
+			$header = $header . ' ' .$appName . ':';
 		}
 
 		$header = $header . ' ' . $msg;
@@ -50,7 +50,7 @@ class SyslogAdapter extends AbstractAdapter {
 	 * @inheritdoc
 	 */
 	protected function send($message) {
-		$fp = fsockopen("udp://" . $this->server, $this->port, $errno, $errstr);
+		$fp = fsockopen('udp://' . $this->server, $this->port, $errno, $errstr);
 		if ($fp) {
 			fwrite($fp, $message);
 			fclose($fp);

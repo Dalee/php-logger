@@ -11,14 +11,15 @@ Currently WIP.
 
 WIP
 
-### Standalone
+### Basic usage
 
 ```
-use Dalee\ELK\Logger;
-use Dalee\ELK\Adapters\SyslogAdapter;
+use Dalee\Logger\Logger;
+use Dalee\Logger\Adapter\SyslogAdapter;
 
-$logger = new Logger;
-$logger->addAdapter(new SyslogAdapter('example.com', '514'));
-
-$logger->log('Will send UDP syslog packet');
+$logger = new Logger(1, 'my-app');
+$logger->addAdapter(new SyslogAdapter('example.com', '5000'));
+$logger->log('LOG');
+$logger->error('ERRR!');
+$logger->warning('BEWARE!');
 ```

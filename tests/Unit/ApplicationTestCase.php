@@ -1,6 +1,6 @@
 <?php
 
-namespace Dalee\ELK\Tests\Unit;
+namespace Dalee\Logger\Tests\Unit;
 
 abstract class ApplicationTestCase extends \PHPUnit_Framework_TestCase {
 
