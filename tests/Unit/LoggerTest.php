@@ -39,7 +39,7 @@ class LoggerTest extends ApplicationTestCase {
 		};
 		$setTooLongHostname = function () {
 			$logger = new Logger();
-			$logger->setHostname("aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
+			$logger->setHostname(
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
@@ -50,7 +50,9 @@ class LoggerTest extends ApplicationTestCase {
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
-				"aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
+				"aaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			);
 		};
 
 		$this->assertException($setInvalidHostname);
@@ -71,11 +73,13 @@ class LoggerTest extends ApplicationTestCase {
 		};
 		$setTooLongApp = function () {
 			$logger = new Logger();
-			$logger->setApp("aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
+			$logger->setApp(
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
-				"aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
+				"aaaaaaaaaaaaaaaaaaaaaaaaaaa"
+			);
 		};
 
 		$this->assertException($setInvalidApp);

@@ -4,9 +4,13 @@ namespace Dalee\ELK\Tests\Unit;
 
 abstract class ApplicationTestCase extends \PHPUnit_Framework_TestCase {
 
-	protected function assertException(callable $callback, $expectedException = 'Exception', $expectedCode = null, $expectedMessage = null)
-	{
-		$expectedException = ltrim((string) $expectedException, '\\');
+	protected function assertException(
+		callable $callback,
+		$expectedException = 'Exception',
+		$expectedCode = null,
+		$expectedMessage = null
+	) {
+		$expectedException = ltrim((string)$expectedException, '\\');
 		if (!class_exists($expectedException) && !interface_exists($expectedException)) {
 			$this->fail(sprintf('An exception of type "%s" does not exist.', $expectedException));
 		}
@@ -28,7 +32,11 @@ abstract class ApplicationTestCase extends \PHPUnit_Framework_TestCase {
 				$this->assertEquals($expectedCode, $code, sprintf('Failed asserting code of thrown %s.', $class));
 			}
 			if ($expectedMessage !== null) {
-				$this->assertContains($expectedMessage, $message, sprintf('Failed asserting the message of thrown %s.', $class));
+				$this->assertContains(
+					$expectedMessage,
+					$message,
+					sprintf('Failed asserting the message of thrown %s.', $class)
+				);
 			}
 			return;
 		}
@@ -39,5 +47,5 @@ abstract class ApplicationTestCase extends \PHPUnit_Framework_TestCase {
 		$errorMessage .= ' was thrown.';
 		$this->fail($errorMessage);
 	}
-	
+
 }

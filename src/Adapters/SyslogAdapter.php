@@ -15,7 +15,7 @@ class SyslogAdapter extends AbstractAdapter {
 	 * @param string $server
 	 * @param int $port
 	 */
-	public function __construct($server='127.0.0.1', $port=514) {
+	public function __construct($server = '127.0.0.1', $port = 514) {
 		$this->server = $server;
 		$this->port = $port;
 	}
@@ -38,11 +38,11 @@ class SyslogAdapter extends AbstractAdapter {
 		}
 
 		if ($app) {
-			$header = $header . ' ' .$app . ':';
+			$header = $header . ' ' . $app . ':';
 		}
 
 		$header = $header . ' ' . $msg;
-		
+
 		return $this->send($header);
 	}
 
@@ -50,7 +50,7 @@ class SyslogAdapter extends AbstractAdapter {
 	 * @inheritdoc
 	 */
 	protected function send($message) {
-		$fp = fsockopen("udp://".$this->server, $this->port, $errno, $errstr);
+		$fp = fsockopen("udp://" . $this->server, $this->port, $errno, $errstr);
 		if ($fp) {
 			fwrite($fp, $message);
 			fclose($fp);

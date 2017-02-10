@@ -42,7 +42,6 @@ use Dalee\ELK\Adapters\AbstractAdapter;
  *    6 Informational: informational messages
  *    7 Debug: debug-level messages
  */
-
 class Logger {
 
 	/** @var int */
@@ -88,10 +87,10 @@ class Logger {
 	 * @param string $app
 	 * @throws Exception on incorrect $hostname / $app
 	 */
-	public function __construct($facility=16, $app="php") {
+	public function __construct($facility = 16, $app = "php") {
 		// just to be sure!
 		if ($facility < 0) {
-			$facility =  0;
+			$facility = 0;
 		}
 		if ($facility > 23) {
 			$facility = 23;
@@ -117,12 +116,12 @@ class Logger {
 		$facility = $val;
 
 		if ($facility < 0) {
-			$facility =  0;
+			$facility = 0;
 		}
 		if ($facility > 23) {
 			$facility = 23;
 		}
-		
+
 		$this->facility = $facility;
 
 		return $this;
@@ -137,7 +136,7 @@ class Logger {
 		if (!$this->hostnameCheck($val)) {
 			throw new \Exception('Hostname should be either IP or correct FQDN and no longer than 255 chars');
 		}
-		
+
 		$this->hostname = $val;
 
 		return $this;
@@ -190,7 +189,7 @@ class Logger {
 		$fqdnCheck = $fqdnCheck && strlen($hostname) <= 255;
 		$fqdnCheck = $fqdnCheck && $this->isValidFQDN($hostname);
 		$fqdnCheck = $fqdnCheck || filter_var($hostname, FILTER_VALIDATE_IP);
-		
+
 		return $fqdnCheck;
 	}
 
@@ -201,7 +200,10 @@ class Logger {
 	 * @return bool
 	 */
 	function isValidFQDN($FQDN) {
-		return (!empty($FQDN) && preg_match('/(?=^.{1,254}$)(^(?:(?!\d|-)[a-z0-9\-]{1,63}(?<!-)\.)+(?:[a-z]{2,})$)/i', $FQDN) > 0);
+		return (!empty($FQDN) && preg_match(
+				'/(?=^.{1,254}$)(^(?:(?!\d|-)[a-z0-9\-]{1,63}(?<!-)\.)+(?:[a-z]{2,})$)/i',
+				$FQDN
+			) > 0);
 	}
 
 	/**

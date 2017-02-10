@@ -4,7 +4,6 @@ namespace Dalee\ELK\Tests\Unit\Adapters;
 
 use Dalee\ELK\Tests\Unit\ApplicationTestCase;
 use Dalee\ELK\Logger;
-use Dalee\ELK\Adapters\AbstractAdapter;
 use Dalee\ELK\Adapters\SyslogAdapter;
 
 class SyslogAdapterTest extends ApplicationTestCase {

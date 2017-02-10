@@ -7,7 +7,7 @@ abstract class AbstractAdapter {
 	/**
 	 * Calculate Syslog message priority.
 	 * @link https://tools.ietf.org/html/rfc5424#section-6.2.1
-	 * 
+	 *
 	 * @param int $facility
 	 * @param int $severity
 	 * @return int
@@ -19,7 +19,7 @@ abstract class AbstractAdapter {
 	/**
 	 * Format message.
 	 * @link https://tools.ietf.org/html/rfc5424#section-6.4
-	 * 
+	 *
 	 * @param string $message
 	 * @return string
 	 */
@@ -29,7 +29,7 @@ abstract class AbstractAdapter {
 
 	/**
 	 * Form and send Syslog message string.
-	 * 
+	 *
 	 * @param int $severity
 	 * @param int $facility
 	 * @param string $hostname
@@ -42,7 +42,7 @@ abstract class AbstractAdapter {
 
 	/**
 	 * Send message.
-	 * 
+	 *
 	 * @param string $message
 	 * @return string
 	 */
