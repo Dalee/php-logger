@@ -44,273 +44,273 @@ use Dalee\ELK\Adapters\AbstractAdapter;
  */
 class Logger {
 
-    /** @var int */
-    const SEVERITY_EMERGENCY = 0;
+	/** @var int */
+	const SEVERITY_EMERGENCY = 0;
 
-    /** @var int */
-    const SEVERITY_ALERT = 1;
+	/** @var int */
+	const SEVERITY_ALERT = 1;
 
-    /** @var int */
-    const SEVERITY_CRITICAL = 2;
+	/** @var int */
+	const SEVERITY_CRITICAL = 2;
 
-    /** @var int */
-    const SEVERITY_ERROR = 3;
+	/** @var int */
+	const SEVERITY_ERROR = 3;
 
-    /** @var int */
-    const SEVERITY_WARNING = 4;
+	/** @var int */
+	const SEVERITY_WARNING = 4;
 
-    /** @var int */
-    const SEVERITY_NOTICE = 5;
+	/** @var int */
+	const SEVERITY_NOTICE = 5;
 
-    /** @var int */
-    const SEVERITY_INFORMATIONAL = 6;
+	/** @var int */
+	const SEVERITY_INFORMATIONAL = 6;
 
-    /** @var int */
-    const SEVERITY_DEBUG = 7;
+	/** @var int */
+	const SEVERITY_DEBUG = 7;
 
-    /** @var int */
-    private $facility;
+	/** @var int */
+	private $facility;
 
-    /** @var string */
-    private $hostname;
+	/** @var string */
+	private $hostname;
 
-    /** @var string */
-    private $app;
+	/** @var string */
+	private $app;
 
-    /** @var array */
-    private $adapters = [];
+	/** @var array */
+	private $adapters = [];
 
-    /**
-     * Logger constructor.
-     *
-     * @param int $facility
-     * @param string $app
-     * @throws Exception on incorrect $hostname / $app
-     */
-    public function __construct($facility = 16, $app = "php") {
-        // just to be sure!
-        if ($facility < 0) {
-            $facility = 0;
-        }
-        if ($facility > 23) {
-            $facility = 23;
-        }
+	/**
+	 * Logger constructor.
+	 *
+	 * @param int $facility
+	 * @param string $app
+	 * @throws Exception on incorrect $hostname / $app
+	 */
+	public function __construct($facility = 16, $app = "php") {
+		// just to be sure!
+		if ($facility < 0) {
+			$facility = 0;
+		}
+		if ($facility > 23) {
+			$facility = 23;
+		}
 
-        $this->facility = $facility;
+		$this->facility = $facility;
 
-        $host = gethostname();
-        $this->hostname = $host && $this->hostnameCheck($host) ? $host : 'webserver';
+		$host = gethostname();
+		$this->hostname = $host && $this->hostnameCheck($host) ? $host : 'webserver';
 
-        if ($app !== "php") {
-            $this->setApp($app);
-        } else {
-            $this->app = $app;
-        }
-    }
+		if ($app !== "php") {
+			$this->setApp($app);
+		} else {
+			$this->app = $app;
+		}
+	}
 
-    /**
-     * @param int $val
-     * @return $this
-     */
-    public function setFacility($val) {
-        $facility = $val;
+	/**
+	 * @param int $val
+	 * @return $this
+	 */
+	public function setFacility($val) {
+		$facility = $val;
 
-        if ($facility < 0) {
-            $facility = 0;
-        }
-        if ($facility > 23) {
-            $facility = 23;
-        }
+		if ($facility < 0) {
+			$facility = 0;
+		}
+		if ($facility > 23) {
+			$facility = 23;
+		}
 
-        $this->facility = $facility;
+		$this->facility = $facility;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @param string $val
-     * @return $this
-     * @throws Exception on incorrect $hostname
-     */
-    public function setHostname($val) {
-        if (!$this->hostnameCheck($val)) {
-            throw new \Exception('Hostname should be either IP or correct FQDN and no longer than 255 chars');
-        }
+	/**
+	 * @param string $val
+	 * @return $this
+	 * @throws Exception on incorrect $hostname
+	 */
+	public function setHostname($val) {
+		if (!$this->hostnameCheck($val)) {
+			throw new \Exception('Hostname should be either IP or correct FQDN and no longer than 255 chars');
+		}
 
-        $this->hostname = $val;
+		$this->hostname = $val;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @param string $val
-     * @return $this
-     * @throws Exception on incorrect $app
-     */
-    public function setApp($val) {
-        if (!preg_match('/^[a-z0-9_.-]{1,48}$/i', $val)) {
-            throw new \Exception('Incorrect app name, it should match: /^[a-z0-9_.-]{1,48}$/i');
-        }
-        $this->app = $val;
+	/**
+	 * @param string $val
+	 * @return $this
+	 * @throws Exception on incorrect $app
+	 */
+	public function setApp($val) {
+		if (!preg_match('/^[a-z0-9_.-]{1,48}$/i', $val)) {
+			throw new \Exception('Incorrect app name, it should match: /^[a-z0-9_.-]{1,48}$/i');
+		}
+		$this->app = $val;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * @return int
-     */
-    public function getFacility() {
-        return $this->facility;
-    }
+	/**
+	 * @return int
+	 */
+	public function getFacility() {
+		return $this->facility;
+	}
 
-    /**
-     * @return string
-     */
-    public function getHostname() {
-        return $this->hostname;
-    }
+	/**
+	 * @return string
+	 */
+	public function getHostname() {
+		return $this->hostname;
+	}
 
-    /**
-     * @return string
-     */
-    public function getApp() {
-        return $this->app;
-    }
+	/**
+	 * @return string
+	 */
+	public function getApp() {
+		return $this->app;
+	}
 
-    /**
-     * Check if hostname is correct FQDN or IP.
-     *
-     * @param $hostname
-     * @return bool
-     */
-    protected function hostnameCheck($hostname) {
-        $fqdnCheck = true;
+	/**
+	 * Check if hostname is correct FQDN or IP.
+	 *
+	 * @param $hostname
+	 * @return bool
+	 */
+	protected function hostnameCheck($hostname) {
+		$fqdnCheck = true;
 
-        $fqdnCheck = $fqdnCheck && strlen($hostname) <= 255;
-        $fqdnCheck = $fqdnCheck && $this->isValidFQDN($hostname);
-        $fqdnCheck = $fqdnCheck || filter_var($hostname, FILTER_VALIDATE_IP);
+		$fqdnCheck = $fqdnCheck && strlen($hostname) <= 255;
+		$fqdnCheck = $fqdnCheck && $this->isValidFQDN($hostname);
+		$fqdnCheck = $fqdnCheck || filter_var($hostname, FILTER_VALIDATE_IP);
 
-        return $fqdnCheck;
-    }
+		return $fqdnCheck;
+	}
 
-    /**
-     * Checks if valid FQDN
-     *
-     * @param $FQDN
-     * @return bool
-     */
-    function isValidFQDN($FQDN) {
-        return (!empty($FQDN) && preg_match(
-                '/(?=^.{1,254}$)(^(?:(?!\d|-)[a-z0-9\-]{1,63}(?<!-)\.)+(?:[a-z]{2,})$)/i',
-                $FQDN
-            ) > 0);
-    }
+	/**
+	 * Checks if valid FQDN
+	 *
+	 * @param $FQDN
+	 * @return bool
+	 */
+	function isValidFQDN($FQDN) {
+		return (!empty($FQDN) && preg_match(
+				'/(?=^.{1,254}$)(^(?:(?!\d|-)[a-z0-9\-]{1,63}(?<!-)\.)+(?:[a-z]{2,})$)/i',
+				$FQDN
+			) > 0);
+	}
 
-    /**
-     * Clear all registered adapters.
-     */
-    public function clearAdapters() {
-        $this->adapters = [];
-    }
+	/**
+	 * Clear all registered adapters.
+	 */
+	public function clearAdapters() {
+		$this->adapters = [];
+	}
 
-    /**
-     * Get current adapters list.
-     *
-     * @return array
-     */
-    public function getAdapters() {
-        return $this->adapters;
-    }
+	/**
+	 * Get current adapters list.
+	 *
+	 * @return array
+	 */
+	public function getAdapters() {
+		return $this->adapters;
+	}
 
-    /**
-     * Register new adapter.
-     *
-     * @param AbstractAdapter $adapter
-     */
-    public function addAdapter(AbstractAdapter $adapter) {
-        array_push($this->adapters, $adapter);
-    }
+	/**
+	 * Register new adapter.
+	 *
+	 * @param AbstractAdapter $adapter
+	 */
+	public function addAdapter(AbstractAdapter $adapter) {
+		array_push($this->adapters, $adapter);
+	}
 
-    /**
-     * @param string $message
-     */
-    public function log($message) {
-        $this->_log(self::SEVERITY_DEBUG, $message);
-    }
+	/**
+	 * @param string $message
+	 */
+	public function log($message) {
+		$this->_log(self::SEVERITY_DEBUG, $message);
+	}
 
-    /**
-     * @param string $message
-     */
-    public function emerg($message) {
-        $this->_log(self::SEVERITY_EMERGENCY, $message);
-    }
+	/**
+	 * @param string $message
+	 */
+	public function emerg($message) {
+		$this->_log(self::SEVERITY_EMERGENCY, $message);
+	}
 
-    /**
-     * @param string $message
-     */
-    public function alert($message) {
-        $this->_log(self::SEVERITY_ALERT, $message);
-    }
+	/**
+	 * @param string $message
+	 */
+	public function alert($message) {
+		$this->_log(self::SEVERITY_ALERT, $message);
+	}
 
-    /**
-     * @param string $message
-     */
-    public function critical($message) {
-        $this->_log(self::SEVERITY_CRITICAL, $message);
-    }
+	/**
+	 * @param string $message
+	 */
+	public function critical($message) {
+		$this->_log(self::SEVERITY_CRITICAL, $message);
+	}
 
-    /**
-     * @param string $message
-     */
-    public function error($message) {
-        $this->_log(self::SEVERITY_CRITICAL, $message);
-    }
+	/**
+	 * @param string $message
+	 */
+	public function error($message) {
+		$this->_log(self::SEVERITY_CRITICAL, $message);
+	}
 
-    /**
-     * @param string $message
-     */
-    public function warning($message) {
-        $this->_log(self::SEVERITY_WARNING, $message);
-    }
+	/**
+	 * @param string $message
+	 */
+	public function warning($message) {
+		$this->_log(self::SEVERITY_WARNING, $message);
+	}
 
-    /**
-     * @param string $message
-     */
-    public function notice($message) {
-        $this->_log(self::SEVERITY_NOTICE, $message);
-    }
+	/**
+	 * @param string $message
+	 */
+	public function notice($message) {
+		$this->_log(self::SEVERITY_NOTICE, $message);
+	}
 
-    /**
-     * @param string $message
-     */
-    public function info($message) {
-        $this->_log(self::SEVERITY_INFORMATIONAL, $message);
-    }
+	/**
+	 * @param string $message
+	 */
+	public function info($message) {
+		$this->_log(self::SEVERITY_INFORMATIONAL, $message);
+	}
 
-    /**
-     * @param string $message
-     */
-    public function debug($message) {
-        $this->_log(self::SEVERITY_DEBUG, $message);
-    }
+	/**
+	 * @param string $message
+	 */
+	public function debug($message) {
+		$this->_log(self::SEVERITY_DEBUG, $message);
+	}
 
-    /**
-     * Invokes log on adapters.
-     *
-     * @param int $severity
-     * @param string $message
-     */
-    private function _log($severity, $message) {
-        $facility = $this->facility;
-        $hostname = $this->hostname;
-        $app = $this->app;
+	/**
+	 * Invokes log on adapters.
+	 *
+	 * @param int $severity
+	 * @param string $message
+	 */
+	private function _log($severity, $message) {
+		$facility = $this->facility;
+		$hostname = $this->hostname;
+		$app = $this->app;
 
-        $now = \DateTime::createFromFormat('U.u', microtime(true));
-        $date = $now->format("M j H:m:s.u");
-        $date = substr($date, 0, strlen($date) - 3);
+		$now = \DateTime::createFromFormat('U.u', microtime(true));
+		$date = $now->format("M j H:m:s.u");
+		$date = substr($date, 0, strlen($date) - 3);
 
-        foreach ($this->adapters as $adapter) {
-            $adapter->write($severity, $facility, $hostname, $app, $date, $message);
-        }
-    }
+		foreach ($this->adapters as $adapter) {
+			$adapter->write($severity, $facility, $hostname, $app, $date, $message);
+		}
+	}
 }
