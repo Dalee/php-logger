@@ -156,7 +156,7 @@ class Logger {
 	private $appName;
 
 	/** @var string */
-	public $logLevel;
+	private $logLevel;
 
 	/** @var array */
 	private $adapters = [];
