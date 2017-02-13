@@ -2,7 +2,7 @@
 
 namespace Dalee\Logger;
 
-use Dalee\Logger\Adapter\AbstractAdapter;
+use Dalee\Logger\Adapter\AdapterInterface;
 
 /**
  * Syslog Dictionary
@@ -360,9 +360,9 @@ class Logger {
 	/**
 	 * Register new adapter.
 	 *
-	 * @param AbstractAdapter $adapter
+	 * @param AdapterInterface $adapter
 	 */
-	public function addAdapter(AbstractAdapter $adapter) {
+	public function addAdapter(AdapterInterface $adapter) {
 		array_push($this->adapters, $adapter);
 	}
 

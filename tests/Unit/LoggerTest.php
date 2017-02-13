@@ -2,8 +2,8 @@
 
 namespace Dalee\Logger\Tests\Unit;
 
+use Dalee\Logger\Adapter\SyslogAdapter;
 use Dalee\Logger\Logger;
-use Dalee\Logger\Adapter\AbstractAdapter;
 
 class LoggerTest extends ApplicationTestCase {
 
@@ -18,13 +18,13 @@ class LoggerTest extends ApplicationTestCase {
 	}
 
 	public function testFacilityChange() {
-		$logger = new Logger;
+		$logger = new Logger();
 		$this->assertEquals(16, $logger->getFacility());
 		$logger->setFacility(3);
 		$this->assertEquals(3, $logger->getFacility());
 
 		$setWrongFacility = function() {
-			(new Logger)->setFacility(-1);
+			(new Logger())->setFacility(-1);
 		};
 		$this->assertException($setWrongFacility, '\UnexpectedValueException');
 	}
@@ -37,10 +37,10 @@ class LoggerTest extends ApplicationTestCase {
 		$this->assertEquals('127.0.0.1', $logger->getHostname());
 
 		$setInvalidHostname = function () {
-			(new Logger)->setHostname('> invalid');
+			(new Logger())->setHostname('> invalid');
 		};
 		$setTooLongHostname = function () {
-			(new Logger)->setHostname("aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
+			(new Logger())->setHostname("aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
@@ -61,7 +61,7 @@ class LoggerTest extends ApplicationTestCase {
 	}
 
 	public function testCorrectAppName() {
-		$logger = new Logger;
+		$logger = new Logger();
 
 		$logger->setAppName('worker-node1');
 		$this->assertEquals('worker-node1', $logger->getAppName());
@@ -69,10 +69,10 @@ class LoggerTest extends ApplicationTestCase {
 		$this->assertEquals('worker-node1', $logger->getAppName());
 
 		$setInvalidApp = function () {
-			(new Logger)->setAppName('> invalid');
+			(new Logger())->setAppName('> invalid');
 		};
 		$setTooLongApp = function () {
-			(new Logger)->setAppName("aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
+			(new Logger())->setAppName("aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaa" .
@@ -106,17 +106,25 @@ class LoggerTest extends ApplicationTestCase {
 		$this->assertEquals(Logger::SEVERITY_DEBUG, $logger->getLogLevel());
 
 		$invalidVal = function () {
-			(new Logger)->setLogLevel('bad');
+			(new Logger())->setLogLevel('bad');
 		};
 
 		$this->assertException($invalidVal, '\InvalidArgumentException');
 	}
 	
 	public function testLogLevelBehavior() {
-		$logger = new Logger;
-		$fakeAdapter = new FakeAdapter;
+		$logger = new Logger();
+		$mock = $this->getMock('\Dalee\Logger\Adapter\SyslogAdapter');
+		$this->messages = [];
 
-		$logger->addAdapter($fakeAdapter);
+		$mock
+			->expects($this->any())
+			->method('write')
+			->will($this->returnCallback(function($severity, $facility, $hostname, $appName, $date, $message){
+				array_push($this->messages, ['severity' => $severity, 'message' => $message]);
+			}));
+
+		$logger->addAdapter($mock);
 		
 		$logger->setLogLevel('warning');
 		$logger->log('DEBUG level should not be logged');
@@ -128,27 +136,16 @@ class LoggerTest extends ApplicationTestCase {
 		$logger->alert('ALERT level should be logged');
 		$logger->emerg('EMERG level should be logged');
 
-		$this->assertEquals(5, count($fakeAdapter->messages));
+		$this->assertEquals(5, count($this->messages));
 
-		$this->assertEquals($fakeAdapter->messages[0]['message'], 'WARNING level should be logged');
-		$this->assertEquals($fakeAdapter->messages[1]['message'], 'ERROR level should be logged');
-		$this->assertEquals($fakeAdapter->messages[2]['message'], 'CRITICAL level should be logged');
-		$this->assertEquals($fakeAdapter->messages[3]['message'], 'ALERT level should be logged');
-		$this->assertEquals($fakeAdapter->messages[4]['message'], 'EMERG level should be logged');
+		$this->assertEquals($this->messages[0]['message'], 'WARNING level should be logged');
+		$this->assertEquals($this->messages[1]['message'], 'ERROR level should be logged');
+		$this->assertEquals($this->messages[2]['message'], 'CRITICAL level should be logged');
+		$this->assertEquals($this->messages[3]['message'], 'ALERT level should be logged');
+		$this->assertEquals($this->messages[4]['message'], 'EMERG level should be logged');
 
 		$logger->clearAdapters();
 		$adapters = $logger->getAdapters();
 		$this->assertEquals(0, count($adapters));
-	}
-}
-
-class FakeAdapter extends AbstractAdapter {
-	public $messages = [];
-
-	public function write($severity, $facility, $hostname, $appName, $date, $message) {
-		array_push($this->messages, ['severity' => $severity, 'message' => $message]);
-	}
-	protected function send($message) {
-
 	}
 }

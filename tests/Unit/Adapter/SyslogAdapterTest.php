@@ -4,7 +4,6 @@ namespace Dalee\Logger\Tests\Unit\Adapters;
 
 use Dalee\Logger\Tests\Unit\ApplicationTestCase;
 use Dalee\Logger\Logger;
-use Dalee\Logger\Adapter\AbstractAdapter;
 use Dalee\Logger\Adapter\SyslogAdapter;
 
 class SyslogAdapterTest extends ApplicationTestCase {
@@ -44,7 +43,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	}
 
 	public function testMessageFormat() {
-		$syslog = new SyslogAdapter;
+		$syslog = new SyslogAdapter();
 
 		$res = $syslog->write(
 			Logger::SEVERITY_EMERGENCY,
@@ -59,7 +58,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	}
 
 	public function testMessageFormatNoHostname() {
-		$syslog = new SyslogAdapter;
+		$syslog = new SyslogAdapter();
 
 		$res = $syslog->write(
 			Logger::SEVERITY_EMERGENCY,
@@ -74,7 +73,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	}
 
 	public function testMessageFormatNoApp() {
-		$syslog = new SyslogAdapter;
+		$syslog = new SyslogAdapter();
 
 		$res = $syslog->write(
 			Logger::SEVERITY_EMERGENCY,
@@ -89,7 +88,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	}
 
 	public function testMessageFormatNoHostnameNoApp() {
-		$syslog = new SyslogAdapter;
+		$syslog = new SyslogAdapter();
 
 		$res = $syslog->write(
 			Logger::SEVERITY_EMERGENCY,
@@ -104,7 +103,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	}
 
 	public function testMessageSendIfNoData() {
-		$syslog = new SyslogAdapter;
+		$syslog = new SyslogAdapter();
 
 		$res = $syslog->write(
 			Logger::SEVERITY_EMERGENCY,

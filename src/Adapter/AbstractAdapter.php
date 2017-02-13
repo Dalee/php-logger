@@ -26,25 +26,4 @@ abstract class AbstractAdapter {
 	protected function cleanMessage($message) {
 		return filter_var($message, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
 	}
-
-	/**
-	 * Form and send Syslog message string.
-	 *
-	 * @param int $severity
-	 * @param int $facility
-	 * @param string $hostname
-	 * @param string $appName
-	 * @param string $date
-	 * @param string $message
-	 * @return string
-	 */
-	abstract public function write($severity, $facility, $hostname, $appName, $date, $message);
-
-	/**
-	 * Send message.
-	 *
-	 * @param string $message
-	 * @return string
-	 */
-	abstract protected function send($message);
 }

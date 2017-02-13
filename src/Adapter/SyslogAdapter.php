@@ -2,7 +2,7 @@
 
 namespace Dalee\Logger\Adapter;
 
-class SyslogAdapter extends AbstractAdapter {
+class SyslogAdapter extends AbstractAdapter implements AdapterInterface {
 
 	/** @var string */
 	private $server;
@@ -49,7 +49,7 @@ class SyslogAdapter extends AbstractAdapter {
 	/**
 	 * @inheritdoc
 	 */
-	protected function send($message) {
+	public function send($message) {
 		$fp = fsockopen('udp://' . $this->server, $this->port, $errno, $errstr);
 		if ($fp) {
 			fwrite($fp, $message);
