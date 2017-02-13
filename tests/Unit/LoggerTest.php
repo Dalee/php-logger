@@ -3,6 +3,7 @@
 namespace Dalee\Logger\Tests\Unit;
 
 use Dalee\Logger\Logger;
+use Dalee\Logger\Adapter\AbstractAdapter;
 
 class LoggerTest extends ApplicationTestCase {
 
@@ -81,5 +82,73 @@ class LoggerTest extends ApplicationTestCase {
 
 		$this->assertException($setInvalidApp, '\UnexpectedValueException');
 		$this->assertException($setTooLongApp, '\UnexpectedValueException');
+	}
+
+	public function testLogLevelAcceptance() {
+		$logger = new Logger();
+
+		$this->assertEquals(Logger::SEVERITY_DEBUG, $logger->getLogLevel());
+		$logger->setLogLevel('emerg');
+		$this->assertEquals(Logger::SEVERITY_EMERGENCY, $logger->getLogLevel());
+		$logger->setLogLevel('alert');
+		$this->assertEquals(Logger::SEVERITY_ALERT, $logger->getLogLevel());
+		$logger->setLogLevel('critical');
+		$this->assertEquals(Logger::SEVERITY_CRITICAL, $logger->getLogLevel());
+		$logger->setLogLevel('error');
+		$this->assertEquals(Logger::SEVERITY_ERROR, $logger->getLogLevel());
+		$logger->setLogLevel('warning');
+		$this->assertEquals(Logger::SEVERITY_WARNING, $logger->getLogLevel());
+		$logger->setLogLevel('notice');
+		$this->assertEquals(Logger::SEVERITY_NOTICE, $logger->getLogLevel());
+		$logger->setLogLevel('info');
+		$this->assertEquals(Logger::SEVERITY_INFORMATIONAL, $logger->getLogLevel());
+		$logger->setLogLevel('debug');
+		$this->assertEquals(Logger::SEVERITY_DEBUG, $logger->getLogLevel());
+
+		$invalidVal = function () {
+			(new Logger)->setLogLevel('bad');
+		};
+
+		$this->assertException($invalidVal, '\InvalidArgumentException');
+	}
+	
+	public function testLogLevelBehavior() {
+		$logger = new Logger;
+		$fakeAdapter = new FakeAdapter;
+
+		$logger->addAdapter($fakeAdapter);
+		
+		$logger->setLogLevel('warning');
+		$logger->log('DEBUG level should not be logged');
+		$logger->info('INFO level should not be logged');
+		$logger->notice('NOTICE should not be logged');
+		$logger->warning('WARNING level should be logged');
+		$logger->error('ERROR level should be logged');
+		$logger->critical('CRITICAL level should be logged');
+		$logger->alert('ALERT level should be logged');
+		$logger->emerg('EMERG level should be logged');
+
+		$this->assertEquals(5, count($fakeAdapter->messages));
+
+		$this->assertEquals($fakeAdapter->messages[0]['message'], 'WARNING level should be logged');
+		$this->assertEquals($fakeAdapter->messages[1]['message'], 'ERROR level should be logged');
+		$this->assertEquals($fakeAdapter->messages[2]['message'], 'CRITICAL level should be logged');
+		$this->assertEquals($fakeAdapter->messages[3]['message'], 'ALERT level should be logged');
+		$this->assertEquals($fakeAdapter->messages[4]['message'], 'EMERG level should be logged');
+
+		$logger->clearAdapters();
+		$adapters = $logger->getAdapters();
+		$this->assertEquals(0, count($adapters));
+	}
+}
+
+class FakeAdapter extends AbstractAdapter {
+	public $messages = [];
+
+	public function write($severity, $facility, $hostname, $appName, $date, $message) {
+		array_push($this->messages, ['severity' => $severity, 'message' => $message]);
+	}
+	protected function send($message) {
+
 	}
 }

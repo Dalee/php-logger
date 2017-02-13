@@ -155,6 +155,9 @@ class Logger {
 	/** @var string */
 	private $appName;
 
+	/** @var string */
+	public $logLevel;
+
 	/** @var array */
 	private $adapters = [];
 
@@ -171,6 +174,66 @@ class Logger {
 		$this->hostname = gethostname();
 
 		$this->appName = $appName;
+		$this->logLevel = isset($_ENV['LOGGER_LEVEL']) ? $this->parseLogLevelVal(['LOGGER_LEVEL']) : self::SEVERITY_DEBUG;
+	}
+
+	/**
+	 * @param string $logLevel
+	 * @return int
+	 */
+	protected function parseLogLevelVal($logLevel) {
+		$severity = null;
+
+		switch ($logLevel) {
+			case 'emerg': {
+				$severity = self::SEVERITY_EMERGENCY;
+				break;
+			}
+			case 'alert': {
+				$severity = self::SEVERITY_ALERT;
+				break;
+			}
+			case 'critical': {
+				$severity = self::SEVERITY_CRITICAL;
+				break;
+			}
+			case 'error': {
+				$severity = self::SEVERITY_ERROR;
+				break;
+			}
+			case 'warning': {
+				$severity = self::SEVERITY_WARNING;
+				break;
+			}
+			case 'notice': {
+				$severity = self::SEVERITY_NOTICE;
+				break;
+			}
+			case 'info': {
+				$severity = self::SEVERITY_INFORMATIONAL;
+				break;
+			}
+			case 'debug': {
+				$severity = self::SEVERITY_DEBUG;
+				break;
+			}
+		}
+		
+		if ($severity === null) {
+			throw new \InvalidArgumentException('Unexpected logger level value');
+		}
+
+		return $severity;
+	}
+
+	/**
+	 * @param string $logLevel
+	 * @return $this
+	 */
+	public function setLogLevel($logLevel) {
+		$this->logLevel = $this->parseLogLevelVal($logLevel);
+
+		return $this;
 	}
 
 	/**
@@ -221,6 +284,13 @@ class Logger {
 		return $this;
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getLogLevel() {
+		return $this->logLevel;
+	}
+	
 	/**
 	 * @return int
 	 */
@@ -366,6 +436,10 @@ class Logger {
 	 * @param string $message
 	 */
 	private function _log($severity, $message) {
+		if ($severity > $this->logLevel) {
+			return;
+		}
+
 		$facility = $this->facility;
 		$hostname = $this->hostname;
 		$appName = $this->appName;
