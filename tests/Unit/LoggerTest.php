@@ -114,7 +114,7 @@ class LoggerTest extends ApplicationTestCase {
 	
 	public function testLogLevelBehavior() {
 		$logger = new Logger();
-		$mock = $this->getMock('\Dalee\Logger\Adapter\SyslogAdapter');
+		$mock = $this->getMock('\Dalee\Logger\Adapter\AdapterInterface');
 		$this->messages = [];
 
 		$mock
