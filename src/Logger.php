@@ -5,9 +5,9 @@ namespace Dalee\Logger;
 use Dalee\Logger\Adapter\AdapterInterface;
 
 /**
- * Logger class
+ * Logger class.
  *
- * Syslog Dictionary
+ * Syslog Dictionary.
  *
  *  Facility values:
  *     0 kernel messages
@@ -317,7 +317,7 @@ class Logger {
 	}
 
 	/**
-	 * Check if hostname is correct FQDN or IP.
+	 * Checks if hostname is correct FQDN or IP.
 	 *
 	 * @param string $hostname
 	 * @return bool
@@ -333,7 +333,7 @@ class Logger {
 	}
 
 	/**
-	 * Checks if valid FQDN
+	 * Checks if valid FQDN.
 	 *
 	 * @param string $fqdn
 	 * @return bool
@@ -346,14 +346,14 @@ class Logger {
 	}
 
 	/**
-	 * Clear all registered adapters.
+	 * Clears all registered adapters.
 	 */
 	public function clearAdapters() {
 		$this->adapters = [];
 	}
 
 	/**
-	 * Get current adapters list.
+	 * Gets current adapters list.
 	 *
 	 * @return array
 	 */
@@ -362,7 +362,7 @@ class Logger {
 	}
 
 	/**
-	 * Register new adapter.
+	 * Registers new adapter.
 	 *
 	 * @param AdapterInterface $adapter
 	 */
@@ -476,7 +476,7 @@ class Logger {
 	}
 
 	/**
-	 * Format message string.
+	 * Formats message string.
 	 * 
 	 * @param array $messageParts
 	 * @return string

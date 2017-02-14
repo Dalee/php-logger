@@ -3,7 +3,7 @@
 namespace Dalee\Logger\Adapter;
 
 /**
- * Class AbstractAdapter
+ * Class AbstractAdapter.
  * 
  * @package Dalee\Logger\Adapter
  */
