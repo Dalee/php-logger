@@ -3,7 +3,7 @@
 namespace Dalee\Logger\Adapter;
 
 /**
- * Class SyslogAdapter
+ * Class SyslogAdapter.
  * 
  * @package Dalee\Logger\Adapter
  */
@@ -69,7 +69,7 @@ class SyslogAdapter extends AbstractAdapter {
 	}
 
 	/**
-	 * Calculate Syslog message priority.
+	 * Calculates Syslog message priority.
 	 * @link https://tools.ietf.org/html/rfc5424#section-6.2.1
 	 *
 	 * @param int $facility
@@ -81,7 +81,7 @@ class SyslogAdapter extends AbstractAdapter {
 	}
 
 	/**
-	 * Format message.
+	 * Formats message.
 	 * @link https://tools.ietf.org/html/rfc5424#section-6.4
 	 *
 	 * @param string $message

@@ -3,13 +3,13 @@
 namespace Dalee\Logger\Adapter;
 
 /**
- * Interface AdapterInterface
+ * Interface AdapterInterface.
  * 
  * @package Dalee\Logger\Adapter
  */
 interface AdapterInterface {
 	/**
-	 * Form and send Syslog message string.
+	 * Forms and sends Syslog message string.
 	 *
 	 * @param int $severity
 	 * @param int $facility
@@ -22,7 +22,7 @@ interface AdapterInterface {
 	public function write($severity, $facility, $hostname, $appName, $date, $message);
 
 	/**
-	 * Send message.
+	 * Sends message.
 	 *
 	 * @param string $message
 	 * @return string
