@@ -371,66 +371,84 @@ class Logger {
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function log($message) {
-		$this->_log(self::SEVERITY_DEBUG, $message);
+		$msg = $this->formatMessage(func_get_args());
+
+		$this->_log(self::SEVERITY_DEBUG, $msg);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function emerg($message) {
-		$this->_log(self::SEVERITY_EMERGENCY, $message);
+		$msg = $this->formatMessage(func_get_args());
+
+		$this->_log(self::SEVERITY_EMERGENCY, $msg);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function alert($message) {
+		$msg = $this->formatMessage(func_get_args());
+
 		$this->_log(self::SEVERITY_ALERT, $message);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function critical($message) {
+		$msg = $this->formatMessage(func_get_args());
+
 		$this->_log(self::SEVERITY_CRITICAL, $message);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function error($message) {
+		$msg = $this->formatMessage(func_get_args());
+
 		$this->_log(self::SEVERITY_CRITICAL, $message);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function warning($message) {
+		$msg = $this->formatMessage(func_get_args());
+
 		$this->_log(self::SEVERITY_WARNING, $message);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function notice($message) {
-		$this->_log(self::SEVERITY_NOTICE, $message);
+		$msg = $this->formatMessage(func_get_args());
+
+		$this->_log(self::SEVERITY_NOTICE, $msg);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function info($message) {
-		$this->_log(self::SEVERITY_INFORMATIONAL, $message);
+		$msg = $this->formatMessage(func_get_args());
+
+		$this->_log(self::SEVERITY_INFORMATIONAL, $msg);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function debug($message) {
-		$this->_log(self::SEVERITY_DEBUG, $message);
+		$msg = $this->formatMessage(func_get_args());
+
+		$this->_log(self::SEVERITY_DEBUG, $msg);
 	}
 
 	/**
@@ -455,5 +473,19 @@ class Logger {
 		foreach ($this->adapters as $adapter) {
 			$adapter->write($severity, $facility, $hostname, $appName, $date, $message);
 		}
+	}
+
+	/**
+	 * Format message string.
+	 * 
+	 * @param array $messageParts
+	 * @return string
+	 */
+	protected function formatMessage($messageParts) {
+		$message = join(' ', array_map(function($arg) {
+			return print_r($arg, true);
+		}, $messageParts));
+
+		return preg_replace('~([\r\n]|(\s\s\s\s))+~', '', $message);
 	}
 }

@@ -165,4 +165,22 @@ class LoggerTest extends ApplicationTestCase {
 		$adapters = $this->logger->getAdapters();
 		$this->assertEquals(0, count($adapters));
 	}
+
+	public function testFormatMessage() {
+		$mock = $this->getMock('\Dalee\Logger\Logger');
+
+		$mock
+			->expects($this->any())
+			->method('formatMessage');
+
+		$reflection = new \ReflectionObject($mock);
+		$method = $reflection->getMethod('formatMessage');
+		$method->setAccessible(true);
+
+		$this->assertEquals($method->invoke($mock, ['DEBUG message']), 'DEBUG message');
+		$this->assertEquals($method->invoke($mock, ['DEBUG', 'message', 'test']), 'DEBUG message test');
+		$this->assertEquals($method->invoke($mock, [[]]), 'Array()');
+		$this->assertEquals($method->invoke($mock, [["a" => "b"]]), 'Array([a] => b)');
+		$this->assertEquals($method->invoke($mock, [(object)["a" => "b"]]), 'stdClass Object([a] => b)');
+	}
 }

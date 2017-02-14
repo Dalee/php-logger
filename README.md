@@ -30,23 +30,23 @@ Global configuration options:
 
 Log methods:
 
-`void log($message: string)` - Debug: debug-level messages (severity = 7)
+`void log($message: mixed, ...)` - Debug: debug-level messages (severity = 7)
 
-`void emerg($message: string)` - Emergency: system is unusable (severity = 0)
+`void emerg($message: mixed, ...)` - Emergency: system is unusable (severity = 0)
 
-`void alert($message: string)` - Alert: action must be taken immediately (severity = 1)
+`void alert($message: mixed, ...)` - Alert: action must be taken immediately (severity = 1)
 
-`void critical($message: string)` - Critical: critical conditions (severity = 2)
+`void critical($message: mixed, ...)` - Critical: critical conditions (severity = 2)
 
-`void error($message: string)` - Error: error conditions (severity = 3)
+`void error($message: mixed, ...)` - Error: error conditions (severity = 3)
 
-`void warning($message: string)` - Warning: warning conditions (severity = 4)
+`void warning($message: mixed, ...)` - Warning: warning conditions (severity = 4)
 
-`void notice($message: string)` - Notice: normal but significant condition (default value) (severity = 5)
+`void notice($message: mixed, ...)` - Notice: normal but significant condition (default value) (severity = 5)
 
-`void info($message: string)` - Informational: informational messages (severity = 6)
+`void info($message: mixed, ...)` - Informational: informational messages (severity = 6)
 
-`void debug($message: string)` - Debug: debug-level messages (severity = 7)
+`void debug($message: mixed, ...)` - Debug: debug-level messages (severity = 7)
 
 ### Adapter configuration
 
