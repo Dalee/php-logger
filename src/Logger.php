@@ -5,6 +5,8 @@ namespace Dalee\Logger;
 use Dalee\Logger\Adapter\AdapterInterface;
 
 /**
+ * Logger class
+ *
  * Syslog Dictionary
  *
  *  Facility values:
@@ -41,6 +43,8 @@ use Dalee\Logger\Adapter\AdapterInterface;
  *    5 Notice: normal but significant condition (default value)
  *    6 Informational: informational messages
  *    7 Debug: debug-level messages
+ *
+ * @package Dalee\Logger
  */
 class Logger {
 
@@ -168,7 +172,7 @@ class Logger {
 	 * @param string $appName
 	 * @throws \UnexpectedValueException on incorrect $facility / $appName
 	 */
-	public function __construct($facility=self::FACILITY_LOCAL0, $appName='php') {
+	public function __construct($facility=self::FACILITY_USER, $appName='php') {
 		$this->setFacility($facility);
 
 		$this->hostname = gethostname();
@@ -256,7 +260,7 @@ class Logger {
 	}
 
 	/**
-	 * @param string $val
+	 * @param string $hostname
 	 * @return $this
 	 * @throws \UnexpectedValueException on incorrect $hostname
 	 */
@@ -315,7 +319,7 @@ class Logger {
 	/**
 	 * Check if hostname is correct FQDN or IP.
 	 *
-	 * @param $hostname
+	 * @param string $hostname
 	 * @return bool
 	 */
 	protected function isHostnameValid($hostname) {
@@ -331,7 +335,7 @@ class Logger {
 	/**
 	 * Checks if valid FQDN
 	 *
-	 * @param $FQDN
+	 * @param string $FQDN
 	 * @return bool
 	 */
 	function isValidFQDN($FQDN) {

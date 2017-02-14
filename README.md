@@ -13,10 +13,10 @@ Currently WIP.
 
 Global configuration options:
 
- * `facility` - facility, default value: `16` (`LOCAL0`) (syslog parameter)
+ * `facility` - facility, default value: `1` (`USER`) (syslog parameter)
  * `hostname` - hostname (syslog parameter), default value: `gethostname()`
  * `appName` - application name (syslog parameter), default value: 'php'
- * `logger_level` - output event level, default value is 'debug', possible values are:
+ * `logLevel` - output event level, default value is 'debug', possible values are:
    * `emerg`
    * `alert`
    * `critical`
@@ -66,7 +66,7 @@ Sample output (udp4 packet):
 use Dalee\Logger\Logger;
 use Dalee\Logger\Adapter\SyslogAdapter;
 
-$logger = new Logger(1, 'my-app');
+$logger = new Logger(Logger::FACILITY_USER, 'my-app');
 $logger->addAdapter(new SyslogAdapter('example.com', '514'));
 $logger->log('LOG');
 $logger->error('ERRR!');

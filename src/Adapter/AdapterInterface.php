@@ -2,6 +2,11 @@
 
 namespace Dalee\Logger\Adapter;
 
+/**
+ * Interface AdapterInterface
+ * 
+ * @package Dalee\Logger\Adapter
+ */
 interface AdapterInterface {
 	/**
 	 * Form and send Syslog message string.

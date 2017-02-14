@@ -8,6 +8,16 @@ use Dalee\Logger\Adapter\SyslogAdapter;
 
 class SyslogAdapterTest extends ApplicationTestCase {
 
+	protected $syslog;
+
+	public function setUp() {
+		$this->syslog = new SyslogAdapter();
+	}
+
+	public function tearDown() {
+		unset($this->syslog);
+	}
+
 	public function testPriorityCalculation() {
 		$mock = $this->getMock(
 			'\Dalee\Logger\Adapter\SyslogAdapter'
@@ -43,9 +53,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	}
 
 	public function testMessageFormat() {
-		$syslog = new SyslogAdapter();
-
-		$res = $syslog->write(
+		$res = $this->syslog->write(
 			Logger::SEVERITY_EMERGENCY,
 			0,
 			'localhost',
@@ -58,9 +66,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	}
 
 	public function testMessageFormatNoHostname() {
-		$syslog = new SyslogAdapter();
-
-		$res = $syslog->write(
+		$res = $this->syslog->write(
 			Logger::SEVERITY_EMERGENCY,
 			0,
 			'',
@@ -73,9 +79,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	}
 
 	public function testMessageFormatNoApp() {
-		$syslog = new SyslogAdapter();
-
-		$res = $syslog->write(
+		$res = $this->syslog->write(
 			Logger::SEVERITY_EMERGENCY,
 			0,
 			'localhost',
@@ -88,9 +92,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	}
 
 	public function testMessageFormatNoHostnameNoApp() {
-		$syslog = new SyslogAdapter();
-
-		$res = $syslog->write(
+		$res = $this->syslog->write(
 			Logger::SEVERITY_EMERGENCY,
 			0,
 			'',
@@ -103,9 +105,7 @@ class SyslogAdapterTest extends ApplicationTestCase {
 	}
 
 	public function testMessageSendIfNoData() {
-		$syslog = new SyslogAdapter();
-
-		$res = $syslog->write(
+		$res = $this->syslog->write(
 			Logger::SEVERITY_EMERGENCY,
 			0,
 			'localhost',

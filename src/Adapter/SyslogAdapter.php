@@ -2,6 +2,11 @@
 
 namespace Dalee\Logger\Adapter;
 
+/**
+ * Class SyslogAdapter
+ * 
+ * @package Dalee\Logger\Adapter
+ */
 class SyslogAdapter extends AbstractAdapter {
 
 	/** @var string */
@@ -12,6 +17,7 @@ class SyslogAdapter extends AbstractAdapter {
 
 	/**
 	 * SyslogAdapter constructor.
+	 * 
 	 * @param string $server
 	 * @param int $port
 	 */
