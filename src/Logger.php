@@ -335,13 +335,13 @@ class Logger {
 	/**
 	 * Checks if valid FQDN
 	 *
-	 * @param string $FQDN
+	 * @param string $fqdn
 	 * @return bool
 	 */
-	function isValidFQDN($FQDN) {
-		return (!empty($FQDN) && preg_match(
+	protected function isValidFQDN($fqdn) {
+		return (!empty($fqdn) && preg_match(
 				'/(?=^.{1,254}$)(^(?:(?!\d|-)[a-z0-9\-]{1,63}(?<!-)\.)+(?:[a-z]{2,})$)/i',
-				$FQDN
+				$fqdn
 			) > 0);
 	}
 
