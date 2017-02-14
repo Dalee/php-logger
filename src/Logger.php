@@ -1,10 +1,12 @@
 <?php
 
-namespace Dalee\ELK;
+namespace Dalee\Logger;
 
-use Dalee\ELK\Adapters\AbstractAdapter;
+use Dalee\Logger\Adapter\AdapterInterface;
 
 /**
+ * Logger class
+ *
  * Syslog Dictionary
  *
  *  Facility values:
@@ -41,6 +43,8 @@ use Dalee\ELK\Adapters\AbstractAdapter;
  *    5 Notice: normal but significant condition (default value)
  *    6 Informational: informational messages
  *    7 Debug: debug-level messages
+ *
+ * @package Dalee\Logger
  */
 class Logger {
 
@@ -69,13 +73,94 @@ class Logger {
 	const SEVERITY_DEBUG = 7;
 
 	/** @var int */
+	const FACILITY_KERNEL = 0;
+
+	/** @var int */
+	const FACILITY_USER = 1;
+
+	/** @var int */
+	const FACILITY_MAIL = 2;
+
+	/** @var int */
+	const FACILITY_SYSTEM = 3;
+
+	/** @var int */
+	const FACILITY_SECURITY0 = 4;
+
+	/** @var int */
+	const FACILITY_SECURITY = 4;
+
+	/** @var int */
+	const FACILITY_SYSLOG = 5;
+
+	/** @var int */
+	const FACILITY_PRINTER = 6;
+
+	/** @var int */
+	const FACILITY_NEWS = 7;
+
+	/** @var int */
+	const FACILITY_UUCP = 8;
+
+	/** @var int */
+	const FACILITY_CLOCK0 = 9;
+
+	/** @var int */
+	const FACILITY_CLOCK = 9;
+
+	/** @var int */
+	const FACILITY_SECURITY1 = 10;
+
+	/** @var int */
+	const FACILITY_FTP = 11;
+
+	/** @var int */
+	const FACILITY_NTP = 12;
+
+	/** @var int */
+	const FACILITY_AUDIT = 13;
+
+	/** @var int */
+	const FACILITY_ALERT = 14;
+
+	/** @var int */
+	const FACILITY_CLOCK1 = 15;
+
+	/** @var int */
+	const FACILITY_LOCAL0 = 16;
+
+	/** @var int */
+	const FACILITY_LOCAL1 = 17;
+
+	/** @var int */
+	const FACILITY_LOCAL2 = 18;
+
+	/** @var int */
+	const FACILITY_LOCAL3 = 19;
+
+	/** @var int */
+	const FACILITY_LOCAL4 = 20;
+
+	/** @var int */
+	const FACILITY_LOCAL5 = 21;
+
+	/** @var int */
+	const FACILITY_LOCAL6 = 22;
+
+	/** @var int */
+	const FACILITY_LOCAL7 = 23;
+
+	/** @var int */
 	private $facility;
 
 	/** @var string */
 	private $hostname;
 
 	/** @var string */
-	private $app;
+	private $appName;
+
+	/** @var string */
+	private $logLevel;
 
 	/** @var array */
 	private $adapters = [];
@@ -84,78 +169,132 @@ class Logger {
 	 * Logger constructor.
 	 *
 	 * @param int $facility
-	 * @param string $app
-	 * @throws Exception on incorrect $hostname / $app
+	 * @param string $appName
+	 * @throws \UnexpectedValueException on incorrect $facility / $appName
 	 */
-	public function __construct($facility = 16, $app = "php") {
-		// just to be sure!
-		if ($facility < 0) {
-			$facility = 0;
+	public function __construct($facility=self::FACILITY_USER, $appName='php') {
+		$this->setFacility($facility);
+
+		$this->hostname = gethostname();
+
+		$this->appName = $appName;
+		$this->logLevel = isset($_ENV['LOGGER_LEVEL']) ? $this->parseLogLevelVal(['LOGGER_LEVEL']) : self::SEVERITY_DEBUG;
+	}
+
+	/**
+	 * @param string $logLevel
+	 * @return int
+	 */
+	protected function parseLogLevelVal($logLevel) {
+		$severity = null;
+
+		switch ($logLevel) {
+			case 'emerg': {
+				$severity = self::SEVERITY_EMERGENCY;
+				break;
+			}
+			case 'alert': {
+				$severity = self::SEVERITY_ALERT;
+				break;
+			}
+			case 'critical': {
+				$severity = self::SEVERITY_CRITICAL;
+				break;
+			}
+			case 'error': {
+				$severity = self::SEVERITY_ERROR;
+				break;
+			}
+			case 'warning': {
+				$severity = self::SEVERITY_WARNING;
+				break;
+			}
+			case 'notice': {
+				$severity = self::SEVERITY_NOTICE;
+				break;
+			}
+			case 'info': {
+				$severity = self::SEVERITY_INFORMATIONAL;
+				break;
+			}
+			case 'debug': {
+				$severity = self::SEVERITY_DEBUG;
+				break;
+			}
 		}
-		if ($facility > 23) {
-			$facility = 23;
+		
+		if ($severity === null) {
+			throw new \InvalidArgumentException('Unexpected logger level value');
+		}
+
+		return $severity;
+	}
+
+	/**
+	 * @param string $logLevel
+	 * @return $this
+	 */
+	public function setLogLevel($logLevel) {
+		$this->logLevel = $this->parseLogLevelVal($logLevel);
+
+		return $this;
+	}
+
+	/**
+	 * @param int $facility
+	 * @return $this
+	 * @throws \UnexpectedValueException on incorrect $facility
+	 */
+	public function setFacility($facility) {
+		if ($facility < self::FACILITY_KERNEL || $facility > self::FACILITY_LOCAL7) {
+			throw new \UnexpectedValueException(sprintf(
+				'Invalid facility value, must be from %d to %d.',
+				self::FACILITY_KERNEL,
+				self::FACILITY_LOCAL7
+			));
 		}
 
 		$this->facility = $facility;
 
-		$host = gethostname();
-		$this->hostname = $host && $this->hostnameCheck($host) ? $host : 'webserver';
-
-		if ($app !== "php") {
-			$this->setApp($app);
-		} else {
-			$this->app = $app;
-		}
+		return $this;
 	}
 
 	/**
-	 * @param int $val
+	 * @param string $hostname
 	 * @return $this
+	 * @throws \UnexpectedValueException on incorrect $hostname
 	 */
-	public function setFacility($val) {
-		$facility = $val;
-
-		if ($facility < 0) {
-			$facility = 0;
+	public function setHostname($hostname) {
+		if (!$this->isHostnameValid($hostname)) {
+			throw new \UnexpectedValueException('Hostname should be either IP or correct FQDN and no longer than 255 chars.');
 		}
-		if ($facility > 23) {
-			$facility = 23;
-		}
-
-		$this->facility = $facility;
+		
+		$this->hostname = $hostname;
 
 		return $this;
 	}
 
 	/**
-	 * @param string $val
+	 * @param string $appName
 	 * @return $this
-	 * @throws Exception on incorrect $hostname
+	 * @throws \UnexpectedValueException on incorrect $appName
 	 */
-	public function setHostname($val) {
-		if (!$this->hostnameCheck($val)) {
-			throw new \Exception('Hostname should be either IP or correct FQDN and no longer than 255 chars');
+	public function setAppName($appName) {
+		if (!preg_match('/^[a-z0-9_.-]{1,48}$/i', $appName)) {
+			throw new \UnexpectedValueException('Incorrect app name, it should match: /^[a-z0-9_.-]{1,48}$/i.');
 		}
-
-		$this->hostname = $val;
+		$this->appName = $appName;
 
 		return $this;
 	}
 
 	/**
-	 * @param string $val
-	 * @return $this
-	 * @throws Exception on incorrect $app
+	 * @return int
 	 */
-	public function setApp($val) {
-		if (!preg_match('/^[a-z0-9_.-]{1,48}$/i', $val)) {
-			throw new \Exception('Incorrect app name, it should match: /^[a-z0-9_.-]{1,48}$/i');
-		}
-		$this->app = $val;
-
-		return $this;
+	public function getLogLevel() {
+		return $this->logLevel;
 	}
-
+	
 	/**
 	 * @return int
 	 */
@@ -173,17 +312,17 @@ class Logger {
 	/**
 	 * @return string
 	 */
-	public function getApp() {
-		return $this->app;
+	public function getAppName() {
+		return $this->appName;
 	}
 
 	/**
 	 * Check if hostname is correct FQDN or IP.
 	 *
-	 * @param $hostname
+	 * @param string $hostname
 	 * @return bool
 	 */
-	protected function hostnameCheck($hostname) {
+	protected function isHostnameValid($hostname) {
 		$fqdnCheck = true;
 
 		$fqdnCheck = $fqdnCheck && strlen($hostname) <= 255;
@@ -196,7 +335,7 @@ class Logger {
 	/**
 	 * Checks if valid FQDN
 	 *
-	 * @param $FQDN
+	 * @param string $FQDN
 	 * @return bool
 	 */
 	function isValidFQDN($FQDN) {
@@ -225,73 +364,91 @@ class Logger {
 	/**
 	 * Register new adapter.
 	 *
-	 * @param AbstractAdapter $adapter
+	 * @param AdapterInterface $adapter
 	 */
-	public function addAdapter(AbstractAdapter $adapter) {
+	public function addAdapter(AdapterInterface $adapter) {
 		array_push($this->adapters, $adapter);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function log($message) {
-		$this->_log(self::SEVERITY_DEBUG, $message);
+		$msg = $this->formatMessage(func_get_args());
+
+		$this->_log(self::SEVERITY_DEBUG, $msg);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function emerg($message) {
-		$this->_log(self::SEVERITY_EMERGENCY, $message);
+		$msg = $this->formatMessage(func_get_args());
+
+		$this->_log(self::SEVERITY_EMERGENCY, $msg);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function alert($message) {
+		$msg = $this->formatMessage(func_get_args());
+
 		$this->_log(self::SEVERITY_ALERT, $message);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function critical($message) {
+		$msg = $this->formatMessage(func_get_args());
+
 		$this->_log(self::SEVERITY_CRITICAL, $message);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function error($message) {
+		$msg = $this->formatMessage(func_get_args());
+
 		$this->_log(self::SEVERITY_CRITICAL, $message);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function warning($message) {
+		$msg = $this->formatMessage(func_get_args());
+
 		$this->_log(self::SEVERITY_WARNING, $message);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function notice($message) {
-		$this->_log(self::SEVERITY_NOTICE, $message);
+		$msg = $this->formatMessage(func_get_args());
+
+		$this->_log(self::SEVERITY_NOTICE, $msg);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function info($message) {
-		$this->_log(self::SEVERITY_INFORMATIONAL, $message);
+		$msg = $this->formatMessage(func_get_args());
+
+		$this->_log(self::SEVERITY_INFORMATIONAL, $msg);
 	}
 
 	/**
-	 * @param string $message
+	 * @param mixed $message,...
 	 */
 	public function debug($message) {
-		$this->_log(self::SEVERITY_DEBUG, $message);
+		$msg = $this->formatMessage(func_get_args());
+
+		$this->_log(self::SEVERITY_DEBUG, $msg);
 	}
 
 	/**
@@ -301,16 +458,34 @@ class Logger {
 	 * @param string $message
 	 */
 	private function _log($severity, $message) {
+		if ($severity > $this->logLevel) {
+			return;
+		}
+
 		$facility = $this->facility;
 		$hostname = $this->hostname;
-		$app = $this->app;
+		$appName = $this->appName;
 
 		$now = \DateTime::createFromFormat('U.u', microtime(true));
-		$date = $now->format("M j H:m:s.u");
+		$date = $now->format('M j H:m:s.u');
 		$date = substr($date, 0, strlen($date) - 3);
 
 		foreach ($this->adapters as $adapter) {
-			$adapter->write($severity, $facility, $hostname, $app, $date, $message);
+			$adapter->write($severity, $facility, $hostname, $appName, $date, $message);
 		}
+	}
+
+	/**
+	 * Format message string.
+	 * 
+	 * @param array $messageParts
+	 * @return string
+	 */
+	protected function formatMessage($messageParts) {
+		$message = join(' ', array_map(function($arg) {
+			return print_r($arg, true);
+		}, $messageParts));
+
+		return preg_replace('~([\r\n]|(\s\s\s\s))+~', '', $message);
 	}
 }

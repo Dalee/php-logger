@@ -1,34 +1,30 @@
 {
-  "name": "dalee-php-logger",
-  "authors": [
-    {
-      "name": "Dalee Dev",
-      "email": "dev@dalee.ru",
-      "homepage": "http://www.dalee.ru"
-    }
-  ],
-  "description": "Php logger for ELK",
-  "license": "MIT",
-  "minimum-stability": "stable",
-  "config": {
-    "secure-http": false,
-    "platform": {
-      "php": "5.4.22"
-    }
-  },
-  "require-dev": {
-    "phpunit/phpunit": "~4.8",
-    "dalee/ppcs": "dev-master",
-    "squizlabs/php_codesniffer": "~2.8"
-  },
-  "autoload": {
-    "psr-4": {
-      "Dalee\\ELK\\": [
-        "src/"
-      ],
-      "Dalee\\ELK\\Tests\\": [
-        "tests/"
-      ]
-    }
-  }
+	"name": "dalee-php-logger",
+	"authors": [
+		{
+			"name": "Dalee Dev",
+			"email": "dev@dalee.ru",
+			"homepage": "http://www.dalee.ru"
+		}
+	],
+	"description": "Php logger for ELK",
+	"license": "MIT",
+	"minimum-stability": "stable",
+	"config": {
+		"secure-http": false,
+		"platform": {
+			"php": "5.4.22"
+		}
+	},
+	"require-dev": {
+		"phpunit/phpunit": "~4.8",
+		"dalee/ppcs": "dev-master",
+		"squizlabs/php_codesniffer": "~2.8"
+	},
+	"autoload": {
+		"psr-4": {
+			"Dalee\\Logger\\": ["src/"],
+			"Dalee\\Logger\\Tests\\": ["tests/"]
+		}
+	}
 }
