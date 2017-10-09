@@ -5,7 +5,7 @@
 
 PHP syslog device implementation, according to the [RFC 3164 rules](https://tools.ietf.org/html/rfc5424).
 
-Currently WIP.
+**DEPRECATED. USE [Monolog syslog3164 handler](https://github.com/Dalee/monolog-syslog3164).**
 
 ## Usage
 
